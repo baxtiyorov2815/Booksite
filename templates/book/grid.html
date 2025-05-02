@@ -1,0 +1,211 @@
+{% extends 'book/base.html' %}
+{% load static %}
+
+{% block title %}Book List{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock extra_head %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+    <!--Main Navigation-->
+<header>
+  
+    <!-- Heading -->
+    <div class="bg-primary mb-4">
+      <div class="container py-4">
+        <h3 class="text-white mt-2">Books</h3>
+        <!-- Breadcrumb -->
+        <nav class="d-flex mb-2">
+          <h6 class="mb-0">
+            <a href="{% url 'home' %}" class="text-white-50">Home</a>
+            <span class="text-white-50 mx-2"> > </span>
+            <a href="" class="text-white"><u>books</u></a>
+          </h6>
+        </nav>
+        <!-- Breadcrumb -->
+      </div>
+    </div>
+    <!-- Heading -->
+  </header>
+  
+<form action="" method="get">
+  <!-- sidebar + content -->
+  <section class="">
+    <div class="container">
+      <div class="row">
+          <!-- sidebar -->
+        <div class="col-lg-3">
+          <!-- Toggle button -->
+          <button
+                  class="btn btn-outline-secondary mb-3 w-100 d-lg-none"
+                  type="button"
+                  data-mdb-toggle="collapse"
+                  data-mdb-target="#navbarSupportedContent"
+                  aria-controls="navbarSupportedContent"
+                  aria-expanded="false"
+                  aria-label="Toggle navigation"
+                  >
+            <span>Show filter</span>
+          </button>
+          <!-- Collapsible wrapper -->
+          <div class="collapse card d-lg-block mb-5" id="navbarSupportedContent">
+            <div class="accordion" id="accordionPanelsStayOpenExample">
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                  <button
+                          class="accordion-button text-dark bg-light"
+                          type="button"
+                          data-mdb-toggle="collapse"
+                          data-mdb-target="#panelsStayOpen-collapseOne"
+                          aria-expanded="true"
+                          aria-controls="panelsStayOpen-collapseOne"
+                          >
+                    Related Authors
+                  </button>
+                </h2>
+                <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne">
+                  <div class="accordion-body">
+                    <ul class="list-unstyled">
+                      <li><a href="?author=all" class="text-dark">All </a></li>
+                      {% for author in authors %}
+                      <li><a href="?author={{ author.id }}" class="text-dark">{{ author }} </a></li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="headingTwo">
+                  <button
+                          class="accordion-button text-dark bg-light"
+                          type="button"
+                          data-mdb-toggle="collapse"
+                          data-mdb-target="#panelsStayOpen-collapseTwo"
+                          aria-expanded="true"
+                          aria-controls="panelsStayOpen-collapseTwo"
+                          >
+                    Genres
+                  </button>
+                </h2>
+                <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse show" aria-labelledby="headingTwo">
+                  <div class="accordion-body">
+                    <div>
+                      {% for genre in genres %}
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="genre" value="{{ genre.id }}" id="genre_{{ genre.id }}">
+                        <label class="form-check-label" for="genre_{{ genre.id }}">{{ genre.title }}</label>
+                      </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="headingThree">
+                  <button
+                          class="accordion-button text-dark bg-light"
+                          type="button"
+                          data-mdb-toggle="collapse"
+                          data-mdb-target="#panelsStayOpen-collapseThree"
+                          aria-expanded="false"
+                          aria-controls="panelsStayOpen-collapseThree"
+                          >
+                    Price
+                  </button>
+                </h2>
+                <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse show" aria-labelledby="headingThree">
+                  <div class="accordion-body">
+                    <div class="row mb-3">
+                      <div class="col-6">
+                        <p class="mb-0">
+                          Min
+                        </p>
+                        <div class="form-outline">
+                          <input type="number" name="min_price" id="typeNumber" class="form-control" />
+                          <label class="form-label" for="typeNumber">$0</label>
+                        </div>
+                      </div>
+                      <div class="col-6">
+                        <p class="mb-0">
+                          Max
+                        </p>
+                        <div class="form-outline">
+                          <input type="number" name="max_price" id="typeNumber" class="form-control" />
+                          <label class="form-label" for="typeNumber">$1,0000</label>
+                        </div>
+                      </div>
+                    </div>
+                    <button type="submit" class="btn btn-outline-success w-100 mt-3">Apply Filters</button>
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item">
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- sidebar -->
+        <div class="col-lg-9">
+          <header class="d-sm-flex align-items-center border-bottom mb-4 pb-3">
+            <strong class="d-block py-2">{{ books|length }} Items found</strong>
+          </header>
+  
+          <div class="row">
+            {% for book in books %}
+            <div class="col-lg-4 col-md-6 col-sm-6 d-flex">
+              <div class="card w-100 my-2 shadow-2-strong">
+                <img src="{{ book.photo.url }}" class="card-img-top" />
+                <div class="card-body d-flex flex-column">
+                  <div class="d-flex flex-row">
+                    {% if book.discount %}
+                    <h5 class="mb-1 me-1">${{ book.discount_price }}</h5>
+                    <span class="text-danger"><s>${{ book.price }}</s></span>
+                    {% else %}
+                    <h5 class="mb-1 me-1">${{ book.price }}</h5>
+                    {% endif %}
+                  </div>
+                  <p class="card-text">{{ book.title }}</p>
+                  <div class="card-footer d-flex align-items-end pt-3 px-0 pb-0 mt-auto">
+                    <a href="{% url 'book_detail' book.id %}" class="btn btn-primary shadow-0 me-1">Add to cart</a>
+                    </div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+  
+          <hr />
+  
+          <!-- Pagination -->
+          <nav aria-label="Page navigation example" class="d-flex justify-content-center mt-3">
+            <ul class="pagination">
+              <li class="page-item disabled">
+                <a class="page-link" href="#" aria-label="Previous">
+                  <span aria-hidden="true">&laquo;</span>
+                </a>
+              </li>
+              <li class="page-item active"><a class="page-link" href="#">1</a></li>
+              <li class="page-item"><a class="page-link" href="#">2</a></li>
+              <li class="page-item"><a class="page-link" href="#">3</a></li>
+              <li class="page-item"><a class="page-link" href="#">4</a></li>
+              <li class="page-item"><a class="page-link" href="#">5</a></li>
+              <li class="page-item">
+                <a class="page-link" href="#" aria-label="Next">
+                  <span aria-hidden="true">&raquo;</span>
+                </a>
+              </li>
+            </ul>
+          </nav>
+          <!-- Pagination -->
+        </div>
+        <!-- content -->
+      </div>
+    </div>            
+  </section>
+</form>
+  <!-- sidebar + content -->
+{% endblock content %}

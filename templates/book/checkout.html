@@ -1,0 +1,198 @@
+{% extends 'book/base.html' %}
+{% load static %}
+{% block title %} Chekout {% endblock %}
+
+{% block extra_head %}
+{% endblock %}
+
+
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+
+<header>
+  
+    <!-- Heading -->
+    <div class="bg-primary">
+      <div class="container py-4">
+        <!-- Breadcrumb -->
+        <nav class="d-flex">
+          <h6 class="mb-0">
+            <a href="" class="text-white-50">Home</a>
+            <span class="text-white-50 mx-2"> > </span>
+            <a href="" class="text-white-50">2. Shopping cart</a>
+            <span class="text-white-50 mx-2"> > </span>
+            <a href="" class="text-white"><u>3. Order info</u></a>
+            <span class="text-white-50 mx-2"> > </span>
+            <a href="" class="text-white-50">4. Payment</a>
+          </h6>
+        </nav>
+        <!-- Breadcrumb -->
+      </div>
+    </div>
+    <!-- Heading -->
+  </header>
+
+<section class="bg-light py-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-xl-8 col-lg-8 mb-4">
+          {% if user.is_authenticated %}
+          {% else %}
+          <div class="card mb-4 border shadow-0">
+            <div class="p-4 d-flex justify-content-between">
+              <div class="">
+                <h5>Have an account?</h5>
+                <p class="mb-0 text-wrap ">Lorem ipsum dolor sit amet, consectetur adipisicing elit</p>
+              </div>
+              <div class="d-flex align-items-center justify-content-center flex-column flex-md-row">
+                <a href="#" class="btn btn-outline-primary me-0 me-md-2 mb-2 mb-md-0 w-100">Register</a>
+                <a href="#" class="btn btn-primary shadow-0 text-nowrap w-100">Sign in</a>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+          <form action="{% url 'checkout' %}" method="post">
+            {% csrf_token %}
+          <!-- Checkout -->
+          <div class="card shadow-0 border">
+            <div class="p-4">
+              <h5 class="card-title mb-3">Guest checkout</h5>
+              
+              <hr class="my-4" />
+  
+              <h5 class="card-title mb-3">Choose one of your address</h5>
+  
+              <div class="row mb-3">
+                {% if adresses %}
+                {% for address in adresses %}
+                <div class="col-lg-4 mb-3">
+                    <div class="form-check h-100 border rounded-3">
+                        <div class="p-3">
+                            <input class="form-check-input" type="radio" name="shipping_addres" id="express" value="{{ address.id }}" checked />
+                            <label class="form-check-label" for="express">
+                                {{ address.city }} <br />
+                                <small class="text-muted">{{ address.address_line }} </small>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <h2>You have not addresses</h2>
+                {% endif %}
+            </div>
+  
+              <div class="row">
+                <div class="col-sm-8 mb-3">
+                  <p class="mb-0">Address</p>
+                  <div class="form-outline">
+                    <input type="text" name="address" id="typeText" placeholder="Type here" class="form-control" />
+                  </div>
+                </div>
+  
+                <div class="col-sm-4 mb-3">
+                  <p class="mb-0">City</p>
+                  <select name="city" class="form-select">
+                    <option value="1">New York</option>
+                    <option value="2">Moscow</option>
+                    <option value="3">Samarqand</option>
+                  </select>
+                </div>
+  
+                <div class="col-sm-4 mb-3">
+                  <p class="mb-0">House</p>
+                  <div class="form-outline">
+                    <input type="text" id="typeText" name="house" placeholder="Type here" class="form-control" />
+                  </div>
+                </div>
+  
+                <div class="col-sm-4 col-6 mb-3">
+                  <p class="mb-0">Postal code</p>
+                  <div class="form-outline">
+                    <input type="text" name="postal_code" id="typeText" class="form-control" />
+                  </div>
+                </div>
+  
+                <div class="col-sm-4 mb-3">
+                  <p class="mb-0">Country</p>
+                  <select name="country" class="form-select">
+                    <option value="usa">USA</option>
+                    <option value="russian">Russian</option>
+                    <option value="uzb">Uzbekistan</option>
+                  </select>
+                </div>
+              </div>
+  
+              <div class="form-check mb-3">
+                <input class="form-check-input" name="save" type="checkbox" value="" id="flexCheckDefault1" />
+                <label class="form-check-label" for="flexCheckDefault1">Save this address</label>
+              </div>
+  
+              <div class="mb-3">
+                <p class="mb-0">Message to seller</p>
+                <div class="form-outline">
+                  <textarea class="form-control" id="textAreaExample1" rows="2"></textarea>
+                </div>
+              </div>
+  
+              <div class="float-end">
+                <button type="submit" class="btn btn-light border">Cancel</button>
+                <button type="submit" class="btn btn-success shadow-0 border">Continue</button>
+              </div>
+            </div>
+          </div>
+        </form>
+          <!-- Checkout -->
+        </div>
+        <div class="col-xl-4 col-lg-4 d-flex justify-content-center justify-content-lg-end">
+          <div class="ms-lg-4 mt-4 mt-lg-0" style="max-width: 320px;">
+            <h6 class="mb-3">Summary</h6>
+            <div class="d-flex justify-content-between">
+              <p class="mb-2">Total price:</p>
+              <p class="mb-2">${{ total_price }}</p>
+            </div>
+            <div class="d-flex justify-content-between">
+              <p class="mb-2">Discount:</p>
+              <p class="mb-2 text-danger">- ${{ discount }}</p>
+            </div>
+            <div class="d-flex justify-content-between">
+              <p class="mb-2">Shipping cost:</p>
+              <p class="mb-2" id="shipping-cost">+ ${{ shipping_cost }}</p>
+            </div>
+            <hr />
+            <div class="d-flex justify-content-between">
+              <p class="mb-2">Total price:</p>
+              <p class="mb-2 fw-bold" id="total-price">${{ total_cost }}</p>
+            </div>
+            <form action="{% url 'checkout' %}" method="get">
+            <div class="input-group mt-3 mb-4">
+              <input type="text" class="form-control border" name="promo_code" placeholder="Promo code" />
+              <button type="submit" class="btn btn-light text-primary border">Apply</button>
+            </div>
+          </form>
+  
+            <hr />
+            <h6 class="text-dark my-4">Items in cart</h6>
+            {% for item in order_items %}
+            <div class="d-flex align-items-center mb-4">
+              <div class="me-3 position-relative">
+                <img src="{{ item.book.photo.url }}" style="height: 96px; width: 96x;" class="img-sm rounded border" />
+              </div>
+              <div class="">
+                <a href="{% url 'book_detail' item.book.id %}" class="nav-link">
+                  {{ item.book.title }}
+                </a>
+                <div class="price text-muted">Total: {{ item.price }}</div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+</section>
+
+{% endblock %}
