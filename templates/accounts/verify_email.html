@@ -1,0 +1,55 @@
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% load socialaccount %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verification Code</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            height: 100vh;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        input[type="text"], input[type="submit"] {
+            padding: 10px;
+            margin-top: 10px;
+            width: 100%;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        input[type="submit"] {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+{% include 'book/messages.html' %}
+<body>
+<div class="container">
+    <h2>Email orqali yuborilgan kodni kiriting</h2>
+    <form action="{% url 'verify_email' email %}" method="POST">
+        {% csrf_token %}
+        <label for="code">Tasdiqlash kodi:</label><br>
+        <input type="text" id="code" name="verification_code" required><br>
+        <input type="submit" value="Tasdiqlash">
+    </form>
+</div>
+</body>
+</html>
