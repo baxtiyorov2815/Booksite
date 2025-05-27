@@ -6,3 +6,4 @@ django-allauth==65.7.0
 PyJWT==2.10.1
 cryptography==44.0.2
 requests
+djangorestframework==3.16.0

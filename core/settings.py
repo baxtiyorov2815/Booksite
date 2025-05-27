@@ -40,10 +40,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bootstrap5',
+    'rest_framework',
+
     #local
     'book',
     'accounts',
     'shopping',
+    'api',
 
     #allauth apps
     'allauth',
