@@ -1,8 +1,29 @@
 from django.db import models
 from django.db.models import Avg
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 
 CustomUser = get_user_model()
+
+class BookQuerySet(models.QuerySet):
+    def is_public(self):
+        return self.filter(public=True)
+    
+    def search(self, query, user=None):
+        lookup = Q(title__icontains=query) | Q(description__icontains=query)
+        qs = self.is_public().filter(lookup)
+        if user is not None:
+            qs2 = self.filter(user=user).filter(lookup)
+            qs = (qs | qs2).distinct()
+        
+        return qs
+    
+class BookManager(models.Manager):
+    def get_queryset(self, *args, **kwargs):
+        return BookQuerySet(self.model, using=self._db)
+    
+    def search(self, query, user=None):
+        return self.get_queryset().search(query, user=user)
 
 class Author(models.Model):
 
@@ -31,6 +52,12 @@ class Genre(models.Model):
 class Book(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
+    user = models.ForeignKey(
+        to=CustomUser,
+        default=1,
+        null=True,
+        on_delete=models.SET_NULL
+    )
     price = models.DecimalField(decimal_places=2, max_digits=10)
     amount = models.IntegerField()
     photo = models.ImageField(upload_to='media/book/books')
@@ -41,6 +68,9 @@ class Book(models.Model):
     genres = models.ManyToManyField(Genre, blank=True, related_name='books', verbose_name="Genre")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)   
+    public = models.BooleanField(default=True)
+
+    objects = BookManager()
 
     @property
     def discount_price(self):

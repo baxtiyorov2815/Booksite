@@ -7,6 +7,11 @@ from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.generics import GenericAPIView, ListAPIView, ListCreateAPIView, DestroyAPIView, RetrieveAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework import status, mixins
+from rest_framework.permissions import IsAdminUser, IsAuthenticatedOrReadOnly
+from .permissions import IsStaff, IsStaffOrReadOnly, IsAdminOrReadOnlyForStaff
+from rest_framework import authentication
+
+from .mixins import UserQuerySetMixin
 
 # @api_view(['GET', 'POST', 'DELETE'])
 # def get_authors(request):
@@ -130,14 +135,23 @@ from rest_framework import status, mixins
 #Authors
 
 class AuthorListAPIView(ListAPIView):
+    permission_classes = [IsStaff]
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
 
 class AuthorListCreateAPIView(ListCreateAPIView):
+    permission_classes = [IsAdminUser]
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
 
+    def perform_create(self, serializer):
+        email = serializer.validated_data.pop('email')
+
+        
+        serializer.save()
+
 class AuthorDeleteAPIView(APIView):
+    permission_classes = [IsStaff]
     
     def get_object(self, pk):
         try:
@@ -153,10 +167,12 @@ class AuthorDeleteAPIView(APIView):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 class AuthorRetrieveAPIView(RetrieveAPIView):
+    permission_classes = [IsStaffOrReadOnly]
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
 
 class AuthorRetrieveUpdateDeleteAPIView(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsStaffOrReadOnly]
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
 
@@ -167,15 +183,44 @@ class BookListAPIView(ListAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
 
-class AuthorListCreateAPIView(ListCreateAPIView):
+class BookListCreateAPIView(
+    UserQuerySetMixin,
+    ListCreateAPIView,
+):
+    permission_classes = [IsStaffOrReadOnly]
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    authentication_classes = [
+        authentication.TokenAuthentication,
+        authentication.SessionAuthentication
+    ]
+    # allow_staff_view = True
+
+    def perform_create(self, serializer):
+        title = serializer.validated_data.get('title')
+        print(title)
+
+        serializer.save(user=self.request.user)
+
+    # def get_queryset(self, *args, **kwargs):
+    #     user = self.request.user
+    #     qs = super().get_queryset(*args, **kwargs)
+
+    #     if not user.is_authenticated:
+    #         return Book.objects.none()
+        
+    #     return qs.filter(user=user)
+
+class BookRetrieveAPIView(RetrieveAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
 
-class AuthorRetrieveAPIView(RetrieveAPIView):
-    queryset = Book.objects.all()
-    serializer_class = BookSerializer
-
-class AuthorRetrieveUpdateDeleteAPIView(RetrieveUpdateDestroyAPIView):
+class BookRetrieveUpdateDeleteAPIView(RetrieveUpdateDestroyAPIView):
+    authentication_classes = [
+        authentication.SessionAuthentication,
+        authentication.TokenAuthentication
+    ]
+    permission_classes = [IsStaffOrReadOnly]
     queryset = Book.objects.all()
     serializer_class = BookSerializer
 
@@ -186,7 +231,7 @@ class GenresListAPIView(mixins.ListModelMixin,
                        mixins.DestroyModelMixin,
                        mixins.RetrieveModelMixin,
                        GenericAPIView):
-    
+    permission_classes = [IsStaffOrReadOnly]
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
 
@@ -203,7 +248,7 @@ class GenreListAPIView(mixins.RetrieveModelMixin,
                        mixins.UpdateModelMixin,
                        mixins.DestroyModelMixin,
                        GenericAPIView):
-    
+    permission_classes = [IsStaffOrReadOnly]
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
 
@@ -221,7 +266,7 @@ class UsersListAPIView(mixins.ListModelMixin,
                        mixins.CreateModelMixin,
                        mixins.DestroyModelMixin,
                        GenericAPIView):
-    
+    permission_classes = [IsAdminOrReadOnlyForStaff]
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
 
@@ -239,7 +284,7 @@ class UserListAPIView(mixins.RetrieveModelMixin,
                       mixins.UpdateModelMixin,
                       mixins.DestroyModelMixin,
                       GenericAPIView):
-    
+    permission_classes = [IsAdminOrReadOnlyForStaff]
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
 

@@ -62,7 +62,11 @@
         {% for new in new_books %}
         <div class="col-lg-3 col-md-6 col-sm-6 d-flex">
           <div class="card w-100 my-2 shadow-2-strong">
+            {% if new.photo %}
             <img src="{{ new.photo.url }}" class="card-img-top" style="aspect-ratio: 1 / 1" />
+            {% else %}
+            <img src="" class="card-img-top" style="aspect-ratio: 1 / 1" />
+            {% endif %}
             <div class="card-body d-flex flex-column">
               <h5 class="card-title">{{ new.title }}</h5>
               <p class="card-text">${{ new.price }}</p>
@@ -85,7 +89,11 @@
         {% for most in most_sold %}
         <div class="col-lg-3 col-md-6 col-sm-6 d-flex">
           <div class="card w-100 my-2 shadow-2-strong">
+            {% if most.photo %}
             <img src="{{ most.photo.url }}" class="card-img-top" style="aspect-ratio: 1 / 1" />
+            {% else %}
+            <img src="" class="card-img-top" style="aspect-ratio: 1 / 1" />
+            {% endif %}
             <div class="card-body d-flex flex-column">
               <h5 class="card-title">{{ most.title }}</h5>
               <p class="card-text">${{ most.price }}</p>
@@ -109,7 +117,11 @@
         {% for rated in most_rated %}
         <div class="col-lg-3 col-md-6 col-sm-6 d-flex">
           <div class="card w-100 my-2 shadow-2-strong">
+            {% if rated.photo %}
             <img src="{{ rated.photo.url }}" class="card-img-top" style="aspect-ratio: 1 / 1" />
+            {% else %}
+            <img src="" class="card-img-top" style="aspect-ratio: 1 / 1" />
+            {% endif %}
             <div class="card-body d-flex flex-column">
               <h5 class="card-title">{{ rated.title }}</h5>
               <p class="card-text">${{ rated.price }}</p>
